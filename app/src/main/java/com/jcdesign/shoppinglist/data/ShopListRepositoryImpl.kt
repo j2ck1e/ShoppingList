@@ -10,7 +10,6 @@ import javax.inject.Inject
 class ShopListRepositoryImpl @Inject constructor(
     private val mapper : ShopListMapper,
     private val shopListDao : ShopListDao,
-    application: Application
 ) : ShopListRepository {
 
 
