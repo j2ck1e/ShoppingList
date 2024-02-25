@@ -1,6 +1,7 @@
 package com.jcdesign.shoppinglist.di
 
 import android.app.Application
+import com.jcdesign.shoppinglist.data.ShopListProvider
 import com.jcdesign.shoppinglist.presentation.MainActivity
 import com.jcdesign.shoppinglist.presentation.ShopItemFragment
 import dagger.BindsInstance
@@ -20,6 +21,8 @@ interface ApplicationComponent {
     fun inject(activity: MainActivity)
 
     fun inject(fragment: ShopItemFragment)
+
+    fun inject(provider: ShopListProvider)
 
 
     @Component.Factory

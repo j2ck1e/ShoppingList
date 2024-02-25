@@ -1,17 +1,22 @@
 package com.jcdesign.shoppinglist.presentation
 
+import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.jcdesign.shoppinglist.databinding.FragmentShopItemBinding
 import com.jcdesign.shoppinglist.domain.ShopItem
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 class ShopItemFragment : Fragment() {
 
@@ -28,7 +33,7 @@ class ShopItemFragment : Fragment() {
     @Inject
     lateinit var viewmodelFactory: ViewModelFactory
 
-    private val component by lazy{
+    private val component by lazy {
         (requireActivity().application as ShopListApp).component
     }
 
@@ -75,7 +80,7 @@ class ShopItemFragment : Fragment() {
     private fun launchRightMode() {
         when (screenMode) {
             MODE_EDIT -> launchEditMode()
-            MODE_ADD  -> launchAddMode()
+            MODE_ADD -> launchAddMode()
         }
     }
 
@@ -104,24 +109,53 @@ class ShopItemFragment : Fragment() {
         })
     }
 
+
     private fun launchEditMode() {
         viewModel.getShopItem(shopItemId)
         binding.saveButton.setOnClickListener {
-            viewModel.editShopItem(
-                binding.etName.text?.toString(),
-                binding.etCount.text?.toString()
-            )
+//            viewModel.editShopItem(
+//                binding.etName.text?.toString(),
+//                binding.etCount.text?.toString()
+//            )
+            thread {
+                context?.contentResolver?.update(
+                    Uri.parse("content://com.jcdesign.shoppinglist/shop_item/"),
+                    ContentValues().apply {
+                        put("id", shopItemId)
+                        put("name", binding.etName.text?.toString())
+                        put("count", binding.etCount.text?.toString()?.toInt())
+                        put("enabled", true)
+                    },
+                    null,
+                    null
+                )
+            }
         }
     }
 
+
     private fun launchAddMode() {
         binding.saveButton.setOnClickListener {
-            viewModel.addShopItem(
-                binding.etName.text?.toString(),
-                binding.etCount.text?.toString()
-            )
+//            viewModel.addShopItem(
+//                binding.etName.text?.toString(),
+//                binding.etCount.text?.toString()
+//            )
+
+            thread {
+                context?.contentResolver?.insert(
+                    Uri.parse("content://com.jcdesign.shoppinglist/shop_item/"),
+                    ContentValues().apply {
+                        put("id", 0)
+                        put("name", binding.etName.text?.toString())
+                        put("count", binding.etCount.text?.toString()?.toInt())
+                        put("enabled", true)
+                    }
+                )
+            }
+
         }
     }
+
 
     private fun parseParams() {
         val args = requireArguments()
